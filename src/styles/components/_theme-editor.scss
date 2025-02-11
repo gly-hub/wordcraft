@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../base/variables' as *;
 
 .theme-editor {
@@ -80,7 +81,7 @@
       color: $text-primary;
 
       &:hover {
-        background-color: darken($bg-secondary, 5%);
+        background-color: color.adjust($bg-secondary, $lightness: -5%);
       }
     }
   }
@@ -183,7 +184,7 @@
       margin: 0;
 
       &:hover {
-        border-color: darken($border-color, 10%);
+        border-color: color.adjust($border-color, $lightness: -10%);
       }
 
       &:focus {
@@ -236,7 +237,7 @@
       cursor: pointer;
 
       &:hover {
-        border-color: darken($border-color, 10%);
+        border-color: color.adjust($border-color, $lightness: -10%);
       }
 
       &:focus {

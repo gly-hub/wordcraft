@@ -525,60 +525,6 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ onSave, onClose, initi
     </div>
   );
 
-  const renderHeadingStyleEditor = () => (
-    <div className="space-y-4">
-      <div className="flex gap-2 mb-4">
-        {['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].map((level) => (
-          <button
-            key={level}
-            onClick={() => handleHeadingLevelChange(level as HeadingLevel)}
-            className={`px-3 py-1 text-sm rounded ${
-              selectedHeadingLevel === level
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            {level.toUpperCase()}
-          </button>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        {Object.entries(headingStyleTemplates).map(([key, template]) => (
-          <button
-            key={key}
-            onClick={() => applyHeadingStyle(template.style, key)}
-            className={`flex flex-col items-start p-3 border rounded-lg hover:bg-gray-50 ${
-              selectedTemplate === key ? 'ring-2 ring-blue-500' : ''
-            }`}
-          >
-            <span className="mb-2 text-sm font-medium">{template.name}</span>
-            <div
-              className="p-2 w-full text-sm rounded"
-              style={template.style}
-            >
-              示例文本
-            </div>
-          </button>
-        ))}
-      </div>
-
-      <div className="space-y-3">
-        <ColorInput
-          label="背景颜色"
-          value={(theme.headings as any)[selectedHeadingLevel].background || 'none'}
-          onChange={(value) => handleChange(`headings.${selectedHeadingLevel}.background`, value)}
-          supportsGradient={true}
-        />
-        {renderColorInput('文字颜色', `headings.${selectedHeadingLevel}.color`, (theme.headings as any)[selectedHeadingLevel].color || theme.headings.color)}
-        {renderTextInput('内边距', `headings.${selectedHeadingLevel}.padding`, (theme.headings as any)[selectedHeadingLevel].padding || '0')}
-        {renderTextInput('圆角', `headings.${selectedHeadingLevel}.borderRadius`, (theme.headings as any)[selectedHeadingLevel].borderRadius || '0')}
-        {renderTextInput('边框', `headings.${selectedHeadingLevel}.borderLeft`, (theme.headings as any)[selectedHeadingLevel].borderLeft || 'none')}
-        {renderTextInput('阴影', `headings.${selectedHeadingLevel}.boxShadow`, (theme.headings as any)[selectedHeadingLevel].boxShadow || 'none')}
-      </div>
-    </div>
-  );
-
   return (
     <div className="theme-editor">
       <div className="theme-editor__container">
@@ -642,15 +588,15 @@ export const ThemeEditor: React.FC<ThemeEditorProps> = ({ onSave, onClose, initi
               <div className="theme-editor__form">
                 <ColorInput
                   label="背景颜色"
-                  value={(theme.headings as any)[selectedHeadingLevel].background || 'none'}
+                  value={theme.headings[selectedHeadingLevel].background || 'none'}
                   onChange={(value) => handleChange(`headings.${selectedHeadingLevel}.background`, value)}
                   supportsGradient={true}
                 />
-                {renderColorInput('文字颜色', `headings.${selectedHeadingLevel}.color`, (theme.headings as any)[selectedHeadingLevel].color || theme.headings.color)}
-                {renderTextInput('内边距', `headings.${selectedHeadingLevel}.padding`, (theme.headings as any)[selectedHeadingLevel].padding || '0')}
-                {renderTextInput('圆角', `headings.${selectedHeadingLevel}.borderRadius`, (theme.headings as any)[selectedHeadingLevel].borderRadius || '0')}
-                {renderTextInput('边框', `headings.${selectedHeadingLevel}.borderLeft`, (theme.headings as any)[selectedHeadingLevel].borderLeft || 'none')}
-                {renderTextInput('阴影', `headings.${selectedHeadingLevel}.boxShadow`, (theme.headings as any)[selectedHeadingLevel].boxShadow || 'none')}
+                {renderColorInput('文字颜色', `headings.${selectedHeadingLevel}.color`, theme.headings[selectedHeadingLevel].color || theme.headings.color)}
+                {renderTextInput('内边距', `headings.${selectedHeadingLevel}.padding`, theme.headings[selectedHeadingLevel].padding || '0')}
+                {renderTextInput('圆角', `headings.${selectedHeadingLevel}.borderRadius`, theme.headings[selectedHeadingLevel].borderRadius || '0')}
+                {renderTextInput('边框', `headings.${selectedHeadingLevel}.borderLeft`, theme.headings[selectedHeadingLevel].borderLeft || 'none')}
+                {renderTextInput('阴影', `headings.${selectedHeadingLevel}.boxShadow`, theme.headings[selectedHeadingLevel].boxShadow || 'none')}
               </div>
             </div>
 

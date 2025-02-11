@@ -29,7 +29,7 @@ const Preview: React.FC<PreviewProps> = ({ content }) => {
     h5: ({ children }: ComponentProps) => <h5 style={styles.h5}>{children}</h5>,
     h6: ({ children }: ComponentProps) => <h6 style={styles.h6}>{children}</h6>,
     p: ({ children }: ComponentProps) => <p style={styles.p}>{children}</p>,
-    img: ({ src, alt, ...props }: ComponentProps) => (
+    img: ({ src, alt }: ComponentProps) => (
       src ? (
         <div style={{ margin: styles.img.margin }}>
           <Img

@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '../base/variables' as *;
 
 // 通用按钮样式
@@ -41,7 +42,7 @@
     }
 
     &:active:not(:disabled) {
-      background-color: darken($primary, 15%);
+      background-color: color.adjust($primary, $lightness: -15%);
     }
   }
   
@@ -171,7 +172,7 @@
       border: none;
       
       &:hover:not(:disabled) {
-        background-color: darken($primary-dark, 5%);
+        background-color: color.adjust($primary-dark, $lightness: -5%);
         color: white;
       }
     }

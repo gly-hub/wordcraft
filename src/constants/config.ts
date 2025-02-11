@@ -1,7 +1,15 @@
+declare global {
+  interface Window {
+    env: {
+      NODE_ENV: string;
+    };
+  }
+}
+
 export const APP_CONFIG = {
   APP_NAME: 'WordCraft',
-  API_BASE_URL: process.env.NODE_ENV === 'production' 
-    ? 'https://api.example.com' 
+  API_BASE_URL: window.env?.NODE_ENV === 'production'
+    ? 'https://api.production.com'
     : 'http://localhost:3000',
   STORAGE_KEY_PREFIX: 'wordcraft_',
 };

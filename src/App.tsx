@@ -106,7 +106,7 @@ function processCellContent(cell: HTMLElement): string {
 // 配置图片转换规则
 turndownService.addRule('image', {
   filter: 'img',
-  replacement: function(content, node) {
+  replacement: function(_, node) {
     const img = node as HTMLImageElement;
     return processImage(img);
   }
@@ -120,7 +120,7 @@ turndownService.addRule('codeBlock', {
       node.firstChild?.nodeName === 'CODE'
     );
   },
-  replacement: function(content: string, node: Node) {
+  replacement: function(_: string, node: Node) {
     const code = node.firstChild as HTMLElement;
     const className = code?.getAttribute('class') || '';
     const language = className.replace(/^language-/, '') || '';
@@ -132,7 +132,7 @@ turndownService.addRule('codeBlock', {
 // 配置表格转换规则
 turndownService.addRule('table', {
   filter: 'table',
-  replacement: function(content: string, node: Node) {
+  replacement: function(_: string, node: Node) {
     const table = node as HTMLTableElement;
     let markdown = '\n';
     
@@ -461,10 +461,6 @@ const Home: React.FC = () => {
         <div className="modal">
           <AiChat
             onClose={() => setShowAiChat(false)}
-            onOpenSettings={() => {
-              setShowAiSettings(true);
-              setShowAiChat(false);
-            }}
             onApplyToEditor={(content) => {
               setMarkdown(content);
               setShowAiChat(false);

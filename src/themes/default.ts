@@ -5,100 +5,18 @@ export interface Theme {
     lineHeight: string;
     color: string;
     letterSpacing: string;
-    textAlign: string;
+    textAlign: 'left' | 'right' | 'center' | 'justify' | 'initial' | 'inherit';
   };
   headings: {
     color: string;
     fontWeight: string;
     letterSpacing: string;
-    h1: {
-      fontSize: string;
-      margin: string;
-      textAlign: string;
-      borderBottom?: string;
-      paddingBottom: string;
-      position: 'static' | 'relative' | 'absolute' | 'fixed' | 'sticky';
-      background?: string;
-      color?: string;
-      padding?: string;
-      borderRadius?: string;
-      borderLeft?: string;
-      boxShadow?: string;
-      backgroundClip?: string;
-      WebkitBackgroundClip?: string;
-      WebkitTextFillColor?: string;
-    };
-    h2: {
-      fontSize: string;
-      margin: string;
-      borderLeft: string;
-      paddingLeft: string;
-      color?: string;
-      background?: string;
-      padding?: string;
-      borderRadius?: string;
-      boxShadow?: string;
-      borderBottom?: string;
-      backgroundClip?: string;
-      WebkitBackgroundClip?: string;
-      WebkitTextFillColor?: string;
-    };
-    h3: {
-      fontSize: string;
-      margin: string;
-      color?: string;
-      background?: string;
-      padding?: string;
-      borderRadius?: string;
-      borderLeft?: string;
-      boxShadow?: string;
-      borderBottom?: string;
-      backgroundClip?: string;
-      WebkitBackgroundClip?: string;
-      WebkitTextFillColor?: string;
-    };
-    h4: {
-      fontSize: string;
-      margin: string;
-      color?: string;
-      background?: string;
-      padding?: string;
-      borderRadius?: string;
-      borderLeft?: string;
-      boxShadow?: string;
-      borderBottom?: string;
-      backgroundClip?: string;
-      WebkitBackgroundClip?: string;
-      WebkitTextFillColor?: string;
-    };
-    h5: {
-      fontSize: string;
-      margin: string;
-      color?: string;
-      background?: string;
-      padding?: string;
-      borderRadius?: string;
-      borderLeft?: string;
-      boxShadow?: string;
-      borderBottom?: string;
-      backgroundClip?: string;
-      WebkitBackgroundClip?: string;
-      WebkitTextFillColor?: string;
-    };
-    h6: {
-      fontSize: string;
-      margin: string;
-      color?: string;
-      background?: string;
-      padding?: string;
-      borderRadius?: string;
-      borderLeft?: string;
-      boxShadow?: string;
-      borderBottom?: string;
-      backgroundClip?: string;
-      WebkitBackgroundClip?: string;
-      WebkitTextFillColor?: string;
-    };
+    h1: HeadingStyle;
+    h2: HeadingStyle;
+    h3: HeadingStyle;
+    h4: HeadingStyle;
+    h5: HeadingStyle;
+    h6: HeadingStyle;
   };
   paragraph: {
     margin: string;
@@ -202,6 +120,26 @@ export interface Theme {
       fontStyle: string;
     };
   };
+}
+
+interface HeadingStyle {
+  fontSize: string;
+  margin: string;
+  textAlign?: 'left' | 'right' | 'center' | 'justify' | 'initial' | 'inherit';
+  borderBottom?: string;
+  paddingBottom?: string;
+  position?: 'static' | 'relative' | 'absolute' | 'fixed' | 'sticky';
+  background?: string;
+  color?: string;
+  padding?: string;
+  paddingLeft?: string;
+  borderRadius?: string;
+  borderLeft?: string;
+  boxShadow?: string;
+  backgroundClip?: string;
+  WebkitBackgroundClip?: string;
+  WebkitTextFillColor?: string;
+  display?: 'block' | 'inline-block' | 'inline' | 'flex' | 'inline-flex' | 'none';
 }
 
 export const defaultTheme: Theme = {

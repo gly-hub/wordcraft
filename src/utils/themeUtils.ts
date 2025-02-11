@@ -8,27 +8,27 @@ export function generateInlineStyles(theme: Theme) {
       lineHeight: theme.base.lineHeight,
       color: theme.base.color,
       letterSpacing: theme.base.letterSpacing,
-      textAlign: theme.base.textAlign as 'justify',
+      textAlign: theme.base.textAlign,
     },
     h1: {
       fontWeight: theme.headings.fontWeight,
       color: theme.headings.h1.color || theme.headings.color,
       fontSize: theme.headings.h1.fontSize,
       margin: theme.headings.h1.margin,
-      textAlign: theme.headings.h1.textAlign as 'center',
+      textAlign: theme.headings.h1.textAlign,
       lineHeight: '1.5',
       letterSpacing: theme.headings.letterSpacing,
-      borderBottom: theme.headings.h1.borderBottom,
-      paddingBottom: theme.headings.h1.paddingBottom,
-      position: theme.headings.h1.position as 'relative',
-      background: theme.headings.h1.background,
-      padding: theme.headings.h1.padding,
-      borderRadius: theme.headings.h1.borderRadius,
-      borderLeft: theme.headings.h1.borderLeft,
-      boxShadow: theme.headings.h1.boxShadow,
-      backgroundClip: theme.headings.h1.backgroundClip,
-      WebkitBackgroundClip: theme.headings.h1.WebkitBackgroundClip,
-      WebkitTextFillColor: theme.headings.h1.WebkitTextFillColor,
+      ...(theme.headings.h1.borderBottom && { borderBottom: theme.headings.h1.borderBottom }),
+      ...(theme.headings.h1.paddingBottom && { paddingBottom: theme.headings.h1.paddingBottom }),
+      ...(theme.headings.h1.position && { position: theme.headings.h1.position }),
+      ...(theme.headings.h1.background && { background: theme.headings.h1.background }),
+      ...(theme.headings.h1.padding && { padding: theme.headings.h1.padding }),
+      ...(theme.headings.h1.borderRadius && { borderRadius: theme.headings.h1.borderRadius }),
+      ...(theme.headings.h1.borderLeft && { borderLeft: theme.headings.h1.borderLeft }),
+      ...(theme.headings.h1.boxShadow && { boxShadow: theme.headings.h1.boxShadow }),
+      ...(theme.headings.h1.backgroundClip && { backgroundClip: theme.headings.h1.backgroundClip }),
+      ...(theme.headings.h1.WebkitBackgroundClip && { WebkitBackgroundClip: theme.headings.h1.WebkitBackgroundClip }),
+      ...(theme.headings.h1.WebkitTextFillColor && { WebkitTextFillColor: theme.headings.h1.WebkitTextFillColor }),
     },
     h2: {
       fontWeight: theme.headings.fontWeight,
@@ -230,8 +230,9 @@ export function generateInlineStyles(theme: Theme) {
 export function applyThemeStyles(content: string, theme: Theme) {
   const styles = generateInlineStyles(theme);
   
-  const styleToString = (style: Record<string, string | number>) => {
+  const styleToString = (style: Record<string, string | number | undefined>) => {
     return Object.entries(style)
+      .filter(([, value]) => value !== undefined)
       .map(([key, value]) => `${key.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`)}:${value}`)
       .join(';');
   };
@@ -245,7 +246,7 @@ export function applyThemeStyles(content: string, theme: Theme) {
     .replace(/<h5[^>]*>(.*?)<\/h5>/g, `<h5 style="${styleToString(styles.h5)}">$1</h5>`)
     .replace(/<h6[^>]*>(.*?)<\/h6>/g, `<h6 style="${styleToString(styles.h6)}">$1</h6>`)
     .replace(/<p[^>]*>(.*?)<\/p>/g, `<p style="${styleToString(styles.p)}">$1</p>`)
-    .replace(/<img([^>]*)>/g, (match, attrs) => {
+    .replace(/<img([^>]*)>/g, (_, attrs) => {
       // 提取原始链接
       const originSrcMatch = attrs.match(/data-origin-src="([^"]+)"/);
       const originSrc = originSrcMatch ? originSrcMatch[1] : '';
@@ -260,20 +261,11 @@ export function applyThemeStyles(content: string, theme: Theme) {
       return `<img src="${src}" alt="${alt}" style="${styleToString(styles.img)}" data-type="jpeg" class="rich_pages wxw-img" />`;
     })
     .replace(/<pre[^>]*>([\s\S]*?)<\/pre>/g, `<pre style="${styleToString(styles.pre)}">$1</pre>`)
-    .replace(/<code[^>]*>([\s\S]*?)<\/code>/g, (match, content) => {
+    .replace(/<code[^>]*>([\s\S]*?)<\/code>/g, (_, content) => {
       // 检查是否在 pre 标签内（代码块）
-      const isInPre = match.includes('class="language-') || match.includes('<pre');
+      const isInPre = content.includes('class="language-') || content.includes('<pre');
       // 如果是代码块使用 codeBlock 样式，否则使用 codeInline 样式
-      const style = isInPre ? styles.codeBlock : {
-        ...styles.codeInline,
-        fontFamily: theme.code.inline.fontFamily,
-        fontSize: theme.code.fontSize,
-        lineHeight: theme.code.lineHeight,
-        background: theme.code.inline.background,
-        padding: theme.code.inline.padding,
-        borderRadius: theme.code.inline.borderRadius,
-        color: theme.code.inline.color,
-      };
+      const style = isInPre ? styles.codeBlock : styles.codeInline;
       return `<code style="${styleToString(style)}">${content}</code>`;
     })
     .replace(/<table[^>]*>/g, `<table style="${styleToString(styles.table)}">`)
