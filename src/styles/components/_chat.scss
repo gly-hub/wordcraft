@@ -1,0 +1,353 @@
+@use '../base/variables' as *;
+
+@keyframes fadeIn {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.loading-text {
+  span {
+    display: inline-block;
+    animation: fadeIn 1.4s ease-in-out infinite;
+    
+    &:nth-child(1) { animation-delay: 0s; }
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.4s; }
+  }
+}
+
+.loading-dots {
+  span {
+    width: 6px;
+    height: 6px;
+    background-color: $primary;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 4px;
+    animation: bounce 1s ease-in-out infinite;
+    
+    &:nth-child(1) { 
+      animation-delay: 0s;
+      opacity: 0.6;
+    }
+    &:nth-child(2) { 
+      animation-delay: 0.2s;
+      opacity: 0.8;
+    }
+    &:nth-child(3) { 
+      animation-delay: 0.4s;
+      opacity: 1;
+    }
+  }
+}
+
+.editor-content-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  margin: 0 2px;
+  border-radius: 4px;
+  background-color: rgba($primary, 0.1);
+  color: $primary;
+  font-weight: 500;
+  box-shadow: 0 0 0 1px rgba($primary, 0.2);
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.chat {
+  width: 800px;
+  height: 600px;
+  background-color: $bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-4;
+    border-bottom: 1px solid $border-color;
+  }
+
+  &__title {
+    font-size: $font-size-lg;
+    font-weight: bold;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-2;
+  }
+
+  &__messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: $spacing-4;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-4;
+  }
+
+  &__message {
+    display: flex;
+    gap: $spacing-2;
+    max-width: 80%;
+    position: relative;
+
+    &--user {
+      align-self: flex-end;
+
+      .chat__message-content {
+        background-color: $primary;
+        color: white;
+      }
+
+      .chat__message-action {
+        left: -36px;
+        right: auto;
+      }
+    }
+
+    &--assistant {
+      align-self: flex-start;
+
+      .chat__message-content {
+        background-color: $bg-secondary;
+        color: $text-primary;
+      }
+
+      .chat__message-action {
+        right: -36px;
+        left: auto;
+      }
+    }
+  }
+
+  &__message-action {
+    position: absolute;
+    bottom: 0;
+    transform: translateY(50%);
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: $radius-full;
+    background-color: rgba($bg-primary, 0.8);
+    color: $text-secondary;
+    border: 1px solid $border-color;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: $transition-base;
+    opacity: 0;
+    z-index: 1;
+
+    &--error {
+      background-color: rgba(#ef4444, 0.1);
+      color: #ef4444;
+      border-color: #ef4444;
+
+      &:hover {
+        background-color: rgba(#ef4444, 0.2);
+        color: #ef4444;
+        border-color: #ef4444;
+        box-shadow: 0 2px 4px rgba(#ef4444, 0.1);
+      }
+    }
+
+    &::after {
+      content: attr(title);
+      position: absolute;
+      bottom: -24px;
+      padding: 4px 8px;
+      background-color: rgba(0, 0, 0, 0.75);
+      color: white;
+      font-size: 12px;
+      border-radius: 4px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .chat__message--assistant & {
+      &::after {
+        right: 0;
+      }
+    }
+
+    .chat__message--user & {
+      &::after {
+        left: 0;
+      }
+    }
+
+    &:hover {
+      background-color: $bg-primary;
+      color: $primary;
+      border-color: $primary;
+      box-shadow: 0 2px 4px rgba($primary, 0.1);
+
+      &::after {
+        opacity: 1;
+      }
+    }
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  &__message:hover {
+    .chat__message-action {
+      opacity: 1;
+    }
+  }
+
+  &__message-content {
+    position: relative;
+    padding: $spacing-3;
+    border-radius: $radius-lg;
+    white-space: pre-wrap;
+    word-break: break-word;
+
+    .editor-content-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      margin: 0 2px;
+      border-radius: 4px;
+      background-color: rgba($primary, 0.1);
+      color: $primary;
+      font-weight: 500;
+      box-shadow: 0 0 0 1px rgba($primary, 0.2);
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+
+    // 在用户消息中的标签样式
+    .chat__message--user & .editor-content-tag {
+      background-color: rgba(white, 0.2);
+      color: white;
+      box-shadow: 0 0 0 1px rgba(white, 0.3);
+    }
+  }
+
+  &__input {
+    padding: $spacing-4;
+    border-top: 1px solid $border-color;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2;
+  }
+
+  &__input-actions {
+    display: flex;
+    gap: $spacing-2;
+    justify-content: flex-end;
+  }
+
+  &__textarea {
+    width: 100%;
+    min-height: 120px;
+    max-height: 200px;
+    padding: $spacing-3;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    resize: none;
+    font-family: $font-family-base;
+    font-size: $font-size-base;
+    line-height: 1.5;
+    outline: none;
+    color: $text-primary;
+    background: $bg-primary;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-y: auto;
+
+    &::placeholder {
+      color: $text-secondary;
+      opacity: 1;
+    }
+
+    &:focus {
+      border-color: $primary;
+    }
+  }
+
+  &__submit {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    padding: $spacing-2 $spacing-4;
+    
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.button {
+  &--icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-full;
+    color: $text-secondary;
+    transition: $transition-base;
+    position: relative;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      background-color: rgba($primary, 0.1);
+      color: $primary;
+    }
+
+    // 添加联网搜索按钮的激活状态
+    &--active {
+      color: $primary;
+      background-color: rgba($primary, 0.1);
+
+      &:hover {
+        background-color: rgba($primary, 0.15);
+      }
+
+      // 添加小圆点指示器
+      &::after {
+        content: '';
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background-color: $primary;
+        border-radius: 50%;
+        right: 2px;
+        top: 2px;
+      }
+    }
+  }
+} 
