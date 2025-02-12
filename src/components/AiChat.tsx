@@ -83,10 +83,16 @@ export const AiChat: React.FC<AiChatProps> = ({ onClose, onApplyToEditor, editor
             role: 'system',
             content: getSystemPrompt(enableSearch)
           },
-          ...messages.filter(msg => msg.role !== 'system').map(msg => ({
-            role: msg.role,
-            content: msg.content
-          })),
+          ...messages.filter(msg => msg.role !== 'system').map(msg => {
+            let content = msg.content
+            if (msg.role === 'user' && msg.isEditorContent) {
+              content = msg.content.replace('@编辑器内容', editorContent || '')
+            }
+            return {
+              role: msg.role,
+              content: content
+            }
+          }),
           {
             role: message.role,
             content: message.content
@@ -116,7 +122,6 @@ export const AiChat: React.FC<AiChatProps> = ({ onClose, onApplyToEditor, editor
           }))
         ]
       }
-      console.log(messages)
       const response = await fetch(settings.apiUrl, {
         method: 'POST',
         headers: {
