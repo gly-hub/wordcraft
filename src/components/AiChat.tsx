@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FiSettings, FiFileText, FiSend, FiX, FiClipboard, FiGlobe, FiRefreshCw, FiTrash2 } from 'react-icons/fi';
 import { useAiSettings } from '../contexts/AiSettingsContext';
 import { AiSettings } from './AiSettings';
+import { getSystemPrompt, WELCOME_MESSAGE } from '../constants/prompts';
 
 export interface Message {
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
   isEditorContent?: boolean;
   status: 1 | 2 | 3; // 1-成功 2-失败 3-等待中
@@ -65,6 +66,7 @@ export const AiChat: React.FC<AiChatProps> = ({ onClose, onApplyToEditor, editor
   }, [enableSearch]);
 
   const handleSendToAi = async (message: Message, isRetry = false) => {
+    let sendMessage: any[] = []
     try {
       if (!isRetry) {
         // 如果不是重试，只添加空的assistant消息
@@ -76,19 +78,45 @@ export const AiChat: React.FC<AiChatProps> = ({ onClose, onApplyToEditor, editor
             status: 3
           }
         ]);
-      } else {
-        // 如果是重试，将最后一条失败的消息状态改为等待中
-        setMessages(prev => {
-          const newMessages = [...prev];
-          const lastMessage = newMessages[newMessages.length - 1];
-          if (lastMessage.role === 'assistant' && lastMessage.status === 2) {
-            lastMessage.status = 3;
-            lastMessage.content = '';
+        sendMessage  = [
+          {
+            role: 'system',
+            content: getSystemPrompt(enableSearch)
+          },
+          ...messages.filter(msg => msg.role !== 'system').map(msg => ({
+            role: msg.role,
+            content: msg.content
+          })),
+          {
+            role: message.role,
+            content: message.content
           }
-          return newMessages;
+        ]
+      } else {
+        // 如果是重试，删除上一条失败的消息，并添加新的等待消息
+        setMessages(prev => {
+          const newMessages = prev.slice(0, -1);
+          return [
+            ...newMessages,
+            {
+              role: 'assistant',
+              content: '',
+              status: 3
+            }
+          ];
         });
+        sendMessage  = [
+          {
+            role: 'system',
+            content: getSystemPrompt(enableSearch)
+          },
+          ...messages.slice(0, -1).filter(msg => msg.role !== 'system').map(msg => ({
+            role: msg.role,
+            content: msg.content
+          }))
+        ]
       }
-      
+      console.log(messages)
       const response = await fetch(settings.apiUrl, {
         method: 'POST',
         headers: {
@@ -97,34 +125,7 @@ export const AiChat: React.FC<AiChatProps> = ({ onClose, onApplyToEditor, editor
         },
         body: JSON.stringify({
           model: settings.model,
-          messages: [
-            {
-              role: 'system',
-              content: `你是一位专业的时事焦点评论家和文章优化专家。你的职责是：
-1. 分析用户提供的文章或主题
-2. 提供专业的建议和改进意见
-3. 帮助优化文章的结构和表达
-4. 补充相关的时事背景和专业视角
-5. 提高文章的可读性和说服力
-
-在回答时：
-- 保持专业、客观的评论视角
-- 给出具体、可操作的建议
-- 适时引用相关的时事案例
-- 注意文章的逻辑性和连贯性
-- 关注文章的受众定位${
-  enableSearch ? '\n\n你已开启联网搜索功能，请积极利用最新的时事信息来支持你的分析。' : ''
-}`
-            },
-            ...messages.map(msg => ({
-              role: msg.role,
-              content: msg.content
-            })),
-            {
-              role: message.role,
-              content: message.content
-            }
-          ],
+          messages: sendMessage,
           enable_search: enableSearch
         })
       });
@@ -162,21 +163,18 @@ export const AiChat: React.FC<AiChatProps> = ({ onClose, onApplyToEditor, editor
   };
 
   const handleClearChat = () => {
-    setMessages([{
-      role: 'assistant',
-      content: `你好！我是你的文章优化助手，一位专业的时事焦点评论家。我可以帮你：
-
-• 分析文章结构和论点
-• 优化文章表达和逻辑
-• 补充相关时事背景
-• 提供专业的评论视角
-• 改进文章的说服力
-
-你可以直接发送文章内容，或者告诉我你想写什么主题，我们一起探讨和完善。
-
-💡 提示：可以点击右上角的地球图标开启联网搜索，我将为你提供最新的时事参考。`,
-      status: 1
-    }]);
+    setMessages([
+      {
+        role: 'system',
+        content: getSystemPrompt(enableSearch),
+        status: 1
+      },
+      {
+        role: 'assistant',
+        content: WELCOME_MESSAGE,
+        status: 1
+      }
+    ]);
   };
 
   const scrollToBottom = () => {
@@ -288,7 +286,7 @@ export const AiChat: React.FC<AiChatProps> = ({ onClose, onApplyToEditor, editor
 
       {/* 聊天消息区域 */}
       <div className="chat__messages">
-        {messages.map((message, index) => (
+        {messages.filter(msg => msg.role !== 'system').map((message, index) => (
           <div
             key={index}
             className={`chat__message ${

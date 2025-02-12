@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import TurndownService from 'turndown';
 import { FiCopy, FiCheck, FiSmartphone, FiMonitor, FiSun, FiFeather, FiMessageSquare } from 'react-icons/fi';
-import Preview from './components/Preview';
+import Preview  from './components/Preview';
 import { applyThemeStyles } from './utils/themeUtils';
 import { ThemeProvider, useTheme, ThemeName } from './contexts/ThemeContext';
 import { ThemeEditor } from './components/ThemeEditor';
