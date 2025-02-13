@@ -4,6 +4,8 @@ interface AiSettings {
   apiUrl: string;
   apiKey: string;
   model: string;
+  googleApiKey: string;
+  searchEngineId: string;
 }
 
 interface AiSettingsContextType {
@@ -15,6 +17,8 @@ const defaultSettings: AiSettings = {
   apiUrl: '',
   apiKey: '',
   model: 'gpt-3.5-turbo',
+  googleApiKey: '',
+  searchEngineId: ''
 };
 
 const AiSettingsContext = createContext<AiSettingsContextType>({

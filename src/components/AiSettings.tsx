@@ -12,6 +12,8 @@ export const AiSettings: React.FC<AiSettingsProps> = ({ onClose }) => {
     apiUrl: settings.apiUrl,
     apiKey: settings.apiKey,
     model: settings.model,
+    googleApiKey: settings.googleApiKey || '',
+    searchEngineId: settings.searchEngineId || ''
   });
   const [customModel, setCustomModel] = useState('');
 
@@ -66,6 +68,26 @@ export const AiSettings: React.FC<AiSettingsProps> = ({ onClose }) => {
             value={formData.apiKey}
             onChange={(e) => setFormData(prev => ({ ...prev, apiKey: e.target.value }))}
             placeholder="请输入API Key"
+            className="settings__input"
+          />
+        </div>
+        <div className="settings__field">
+          <label className="settings__label">Google API Key</label>
+          <input
+            type="password"
+            value={formData.googleApiKey}
+            onChange={(e) => setFormData(prev => ({ ...prev, googleApiKey: e.target.value }))}
+            placeholder="用于网络搜索的 Google API Key"
+            className="settings__input"
+          />
+        </div>
+        <div className="settings__field">
+          <label className="settings__label">Search Engine ID</label>
+          <input
+            type="text"
+            value={formData.searchEngineId}
+            onChange={(e) => setFormData(prev => ({ ...prev, searchEngineId: e.target.value }))}
+            placeholder="Google Custom Search Engine ID"
             className="settings__input"
           />
         </div>

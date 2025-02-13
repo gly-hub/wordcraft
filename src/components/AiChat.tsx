@@ -65,39 +65,142 @@ export const AiChat: React.FC<AiChatProps> = ({ onClose, onApplyToEditor, editor
     localStorage.setItem('enableSearch', JSON.stringify(enableSearch));
   }, [enableSearch]);
 
+  interface SearchResult {
+    title: string;
+    snippet: string;
+    link: string;
+    date?: string;
+  }
+
+  interface GoogleSearchItem {
+    title: string;
+    snippet: string;
+    link: string;
+    pagemap?: {
+      metatags?: Array<{
+        'article:published_time'?: string;
+      }>;
+    };
+  }
+
+  // 生成搜索关键词
+  const generateSearchQuery = async (message: Message): Promise<string> => {
+    try {
+      const response = await fetch(settings.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${settings.apiKey}`
+        },
+        body: JSON.stringify({
+          model: settings.model,
+          messages: [
+            {
+              role: 'system',
+              content: '你是一个搜索关键词优化专家。你的任务是根据用户的完整对话历史生成最优的搜索关键词。请分析整个对话上下文，提取关键信息，生成最相关的搜索关键词。请直接返回关键词，不要包含任何解释或其他内容。关键词应该是简短且具有针对性的。'
+            },
+            ...messages.filter(msg => msg.role !== 'system').map(msg => ({
+              role: msg.role,
+              content: msg.content
+            })),
+            {
+              role: 'user',
+              content: `基于以上对话历史，请为这个新问题生成最优的搜索关键词：${message.content}`
+            }
+          ]
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error?.message || 'Failed to generate search query');
+      }
+
+      return data.choices[0].message.content.trim();
+    } catch (error) {
+      console.error('Failed to generate search query:', error);
+      return message.content; // 如果生成失败，使用原始问题作为搜索关键词
+    }
+  };
+
+  // 添加网络搜索函数
+  const performWebSearch = async (query: string): Promise<SearchResult[]> => {
+    try {
+      if (!settings.googleApiKey || !settings.searchEngineId) {
+        console.error('Google API settings not configured');
+        return [];
+      }
+
+      // 构建搜索URL，添加排序和时间限制参数
+      const searchUrl = new URL('https://www.googleapis.com/customsearch/v1');
+      searchUrl.searchParams.append('key', settings.googleApiKey);
+      searchUrl.searchParams.append('cx', settings.searchEngineId);
+      searchUrl.searchParams.append('q', query);
+      searchUrl.searchParams.append('sort', 'date:r:1'); // 按日期逆序排序
+      searchUrl.searchParams.append('dateRestrict', 'y1'); // 限制在最近一年内的结果
+
+      const response = await fetch(searchUrl.toString());
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error?.message || 'Search request failed');
+      }
+      
+      return data.items?.slice(0, 3).map((item: GoogleSearchItem) => ({
+        title: item.title,
+        snippet: item.snippet,
+        link: item.link,
+        // 如果返回结果中包含日期，也可以显示
+        date: item.pagemap?.metatags?.[0]?.['article:published_time'] || ''
+      })) || [];
+    } catch (error) {
+      console.error('Search failed:', error);
+      return [];
+    }
+  };
+
   const handleSendToAi = async (message: Message, isRetry = false) => {
-    let sendMessage: any[] = []
+    let sendMessage: Array<{role: string; content: string}> = [];
     try {
       if (!isRetry) {
-        // 如果不是重试，只添加空的assistant消息
-        setMessages(prev => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: '',
-            status: 3
+        setMessages(prev => [...prev, { role: 'assistant', content: '', status: 3 }]);
+        
+        let searchContext = '';
+        if (enableSearch) {
+          const searchQuery = await generateSearchQuery(message);
+          console.log('Generated search query:', searchQuery);
+          const searchResults = await performWebSearch(searchQuery);
+          if (searchResults.length > 0) {
+            searchContext = `
+相关搜索结果（基于优化后的搜索关键词"${searchQuery}"，按时间最新排序）：
+${searchResults.map((result: SearchResult) => `
+标题：${result.title}
+${result.date ? `发布时间：${new Date(result.date).toLocaleString('zh-CN')}` : ''}
+摘要：${result.snippet}
+链接：${result.link}
+`).join('\n')}
+基于以上最新的搜索结果和用户问题，请给出回答。优先使用最新的信息。
+`;
           }
-        ]);
-        sendMessage  = [
+        }
+
+        sendMessage = [
           {
             role: 'system',
-            content: getSystemPrompt(enableSearch)
+            content: getSystemPrompt(false)
           },
           ...messages.filter(msg => msg.role !== 'system').map(msg => {
-            let content = msg.content
+            let content = msg.content;
             if (msg.role === 'user' && msg.isEditorContent) {
-              content = msg.content.replace('@编辑器内容', editorContent || '')
+              content = msg.content.replace('@编辑器内容', editorContent || '');
             }
-            return {
-              role: msg.role,
-              content: content
-            }
+            return { role: msg.role, content };
           }),
           {
-            role: message.role,
-            content: message.content
+            role: 'user',
+            content: searchContext ? `${searchContext}\n用户问题：${message.content}` : message.content
           }
-        ]
+        ];
       } else {
         // 如果是重试，删除上一条失败的消息，并添加新的等待消息
         setMessages(prev => {
@@ -114,7 +217,7 @@ export const AiChat: React.FC<AiChatProps> = ({ onClose, onApplyToEditor, editor
         sendMessage  = [
           {
             role: 'system',
-            content: getSystemPrompt(enableSearch)
+            content: getSystemPrompt(false)
           },
           ...messages.slice(0, -1).filter(msg => msg.role !== 'system').map(msg => ({
             role: msg.role,
@@ -130,8 +233,7 @@ export const AiChat: React.FC<AiChatProps> = ({ onClose, onApplyToEditor, editor
         },
         body: JSON.stringify({
           model: settings.model,
-          messages: sendMessage,
-          enable_search: enableSearch
+          messages: sendMessage
         })
       });
 
