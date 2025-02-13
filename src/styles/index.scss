@@ -13,4 +13,7 @@
 @use './components/theme-editor';
 
 // 布局样式
-@use './layouts/main'; 
+@use './layouts/main';
+
+// 页面样式
+@import './pages/ai-chat'; 
