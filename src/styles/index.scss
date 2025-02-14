@@ -11,9 +11,10 @@
 @use './components/chat';
 @use './components/settings';
 @use './components/theme-editor';
+@use './components/prompt-settings';
 
 // 布局样式
 @use './layouts/main';
 
 // 页面样式
-@import './pages/ai-chat'; 
+@use './pages/ai-chat'; 

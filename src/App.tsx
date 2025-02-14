@@ -10,7 +10,6 @@ import { AiSettings } from './components/AiSettings';
 import { AiSettingsProvider } from './contexts/AiSettingsContext';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AiChatPage from './pages/AiChatPage';
-import marked from 'marked';
 
 const turndownService = new TurndownService({
   headingStyle: 'atx',
@@ -319,7 +318,7 @@ const Home: React.FC = () => {
         .replace(/\\\\/g, '\\')
         // 修复代码块内的转义
         .replace(/```[\s\S]*?```/g, match => 
-          match.replace(/\\([\\*\[\](){}])/g, '$1')
+          match.replace(/\\([\\*[\](){}])/g, '$1')
         );
         
       setMarkdown(markdownContent);
@@ -331,15 +330,6 @@ const Home: React.FC = () => {
     { name: 'default', icon: FiSun, title: '默认主题' },
     { name: 'cool', icon: FiFeather, title: '酷炫主题' }
   ];
-
-  const markdownToHtml = (markdown: string) => {
-    // 移除 Markdown 中的 HTML 标签
-    const cleanMarkdown = markdown.replace(/<[^>]*>/g, '');
-    // 使用 marked 转换 Markdown 为 HTML
-    const html = marked.parse(cleanMarkdown);
-    // 移除 HTML 中的 script 标签
-    return html.replace(/<script[^>]*>[\s\S]*?<\/script>/g, '');
-  };
 
   if (!mounted) {
     return (

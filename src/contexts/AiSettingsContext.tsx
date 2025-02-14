@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-interface AiSettings {
+export interface AiSettings {
   apiUrl: string;
   apiKey: string;
   model: string;
   googleApiKey: string;
   searchEngineId: string;
+  systemPrompt: string;
+  useDefaultPrompt: boolean;
 }
 
 interface AiSettingsContextType {
@@ -18,7 +20,9 @@ const defaultSettings: AiSettings = {
   apiKey: '',
   model: 'gpt-3.5-turbo',
   googleApiKey: '',
-  searchEngineId: ''
+  searchEngineId: '',
+  systemPrompt: '',
+  useDefaultPrompt: true
 };
 
 const AiSettingsContext = createContext<AiSettingsContextType>({

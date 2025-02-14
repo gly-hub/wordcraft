@@ -55,6 +55,19 @@
     &::placeholder {
       color: $text-secondary;
     }
+
+    &:disabled {
+      background-color: $bg-secondary;
+      cursor: not-allowed;
+    }
+
+    // 当input是textarea时的特殊样式
+    &[rows] {
+      min-height: 300px;
+      resize: vertical;
+      font-family: monospace;
+      line-height: 1.5;
+    }
   }
 
   &__model-select {
@@ -65,9 +78,59 @@
 
   &__footer {
     display: flex;
-    justify-content: flex-end;
-    gap: $spacing-2;
+    justify-content: space-between;
+    align-items: center;
     padding: $spacing-4;
     border-top: 1px solid $border-color;
+    
+    &-actions {
+      display: flex;
+      gap: $spacing-2;
+    }
+  }
+
+  &__prompt-config {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  &__checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    cursor: pointer;
+    user-select: none;
+    font-size: $font-size-base;
+    font-weight: 500;
+    color: $text-primary;
+  }
+
+  &__checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+
+  &__textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--input-background);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    &::placeholder {
+      color: var(--text-secondary);
+    }
   }
 } 

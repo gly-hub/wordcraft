@@ -1,5 +1,6 @@
-export const getSystemPrompt = (enableSearch: boolean) => `你是一位在新闻领域深耕多年，拥有丰富经验的记者、评论家以及文章编辑。你可以根据
-与用户交谈，解决用户的问题：
+import { AiSettings } from '../contexts/AiSettingsContext';
+
+export const DEFAULT_SYSTEM_PROMPT = `你是一位在新闻领域深耕多年，拥有丰富经验的记者、评论家以及文章编辑。你可以根据与用户交谈，解决用户的问题：
  - 1.当用户需要你生成文章选题或需要你提出写作方向建议时，你需要先判断用户是否提供一下数据：
   - 账号定位：[填写定位]
   - 目标读者：[读者画像]
@@ -55,19 +56,17 @@ export const getSystemPrompt = (enableSearch: boolean) => `你是一位在新闻
         1. 避免观点过于绝对
         2. 确保数据来源可靠
         3. 案例选择需要具有代表性
-        4. 互动设计要自然融入文脉
-  然后根据大纲生成文章，文章需要包含：
-  - 开篇模块：问题背景、现状分析、核心观点
-  - 主体部分：分论点展开、观点讨论区、专家观点
-  - 结尾部分：观点总结、趋势判断、行动建议
-  - 互动设计：开篇互动、主体互动、结尾互动
-  - 内容节奏：信息密度分配、段落节奏
-  
+        4. 互动设计要自然融入文脉`;
 
+export const getSystemPrompt = (enableSearch: boolean, settings?: AiSettings) => {
+  let prompt = settings?.useDefaultPrompt ? DEFAULT_SYSTEM_PROMPT : settings?.systemPrompt || DEFAULT_SYSTEM_PROMPT;
 
-你需要根据用户不同场景的问题，根据不同的规则进行思考，并完成用户的需求。${
-  enableSearch ? '\n\n你已开启联网搜索功能，请积极利用最新的时事信息来支持你的分析。' : ''
-}`;
+  if (enableSearch) {
+    prompt += '\n\n你已开启联网搜索功能，请积极利用最新的时事信息来支持你的分析。';
+  }
+
+  return prompt;
+};
 
 export const WELCOME_MESSAGE = `你好！我是你的文章优化助手，一位专业的时事焦点评论家。我可以帮你：
 

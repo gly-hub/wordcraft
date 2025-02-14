@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FiSettings, FiFileText, FiSend, FiX, FiClipboard, FiGlobe, FiRefreshCw, FiTrash2 } from 'react-icons/fi';
+import { FiSettings, FiFileText, FiSend, FiX, FiClipboard, FiGlobe, FiRefreshCw, FiTrash2, FiFeather } from 'react-icons/fi';
 import { useAiSettings } from '../contexts/AiSettingsContext';
 import { AiSettings } from './AiSettings';
 import { getSystemPrompt, WELCOME_MESSAGE } from '../constants/prompts';
+import { PromptSettings } from './PromptSettings';
 
 export interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -56,6 +57,7 @@ export const AiChat: React.FC<AiChatProps> = ({ onClose, onApplyToEditor, editor
     return saved ? JSON.parse(saved) : false;
   });
   const [showSettings, setShowSettings] = useState(false);
+  const [showPromptSettings, setShowPromptSettings] = useState(false);
   const { settings } = useAiSettings();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -187,7 +189,7 @@ ${result.date ? `发布时间：${new Date(result.date).toLocaleString('zh-CN')}
         sendMessage = [
           {
             role: 'system',
-            content: getSystemPrompt(false)
+            content: getSystemPrompt(enableSearch, settings)
           },
           ...messages.filter(msg => msg.role !== 'system').map(msg => {
             let content = msg.content;
@@ -217,7 +219,7 @@ ${result.date ? `发布时间：${new Date(result.date).toLocaleString('zh-CN')}
         sendMessage  = [
           {
             role: 'system',
-            content: getSystemPrompt(false)
+            content: getSystemPrompt(enableSearch, settings)
           },
           ...messages.slice(0, -1).filter(msg => msg.role !== 'system').map(msg => ({
             role: msg.role,
@@ -273,7 +275,7 @@ ${result.date ? `发布时间：${new Date(result.date).toLocaleString('zh-CN')}
     setMessages([
       {
         role: 'system',
-        content: getSystemPrompt(enableSearch),
+        content: getSystemPrompt(enableSearch, settings),
         status: 1
       },
       {
@@ -375,6 +377,13 @@ ${result.date ? `发布时间：${new Date(result.date).toLocaleString('zh-CN')}
             <FiTrash2 />
           </button>
           <button
+            onClick={() => setShowPromptSettings(true)}
+            className="button button--icon"
+            title="配置系统 Prompt"
+          >
+            <FiFeather />
+          </button>
+          <button
             onClick={() => setShowSettings(true)}
             className="button button--icon"
             title="设置"
@@ -466,6 +475,13 @@ ${result.date ? `发布时间：${new Date(result.date).toLocaleString('zh-CN')}
       {showSettings && (
         <div className="modal">
           <AiSettings onClose={() => setShowSettings(false)} />
+        </div>
+      )}
+
+      {/* Prompt设置弹框 */}
+      {showPromptSettings && (
+        <div className="modal">
+          <PromptSettings onClose={() => setShowPromptSettings(false)} />
         </div>
       )}
     </div>
